@@ -248,11 +248,15 @@ $\leadsto$ [Property Based Testing](./4.2 An introduction to property based test
 
     FsCheck.Check.Quick (commutativeProperty add1)
     FsCheck.Check.Quick (commutativeProperty add2);;
-    
-      FsCheck.Check.Quick (commutativeProperty add1)
-      ^^^^^^^
-    
-    /Users/kirchnerg/Desktop/courses/course.2026.hwr.fun/slides/stdin(309,1): error FS0039: The value, namespace, type or module 'FsCheck' is not defined.
+    Ok, passed 100 tests.
+    Falsifiable, after 2 tests (3 shrinks) (StdGen (1517013591, 297603986)):
+    Original:
+    -1
+    2
+    Shrunk:
+    0
+    1
+    val it: unit = ()
 
 
 ## FsCheck (Generate)
@@ -275,11 +279,13 @@ $\leadsto$ [Property Based Testing](./4.2 An introduction to property based test
     
     let test = tempGen |> FsCheck.Gen.sample 0 20
     test;;
-    
-          FsCheck.Gen.oneof [fGen; cGen]
-      ----^^^^^^^
-    
-    /Users/kirchnerg/Desktop/courses/course.2026.hwr.fun/slides/stdin(320,5): error FS0039: The value, namespace, type or module 'FsCheck' is not defined.
+    val tempGen: Gen<Temp> = Gen <fun:Bind@88>
+    val test: Temp list =
+      [F 127; F 104; C 53.0; C 73.0; F 198; C 83.0; F 109; F 100; F 37; F 48;
+       F 188; F 196; F 127; C 40.0; C 42.0; C 22.0; C 2.0; C 70.0; F 185; C 28.0]
+    val it: Temp list =
+      [F 127; F 104; C 53.0; C 73.0; F 198; C 83.0; F 109; F 100; F 37; F 48;
+       F 188; F 196; F 127; C 40.0; C 42.0; C 22.0; C 2.0; C 70.0; F 185; C 28.0]
 
 
 ## FsCheck (Shrink)
@@ -292,11 +298,11 @@ $\leadsto$ [Property Based Testing](./4.2 An introduction to property based test
     let test2 = FsCheck.Arb.shrink 88 |> Seq.toList
     test2
 
-    
-      open FsCheck
-      -----^^^^^^^
-    
-    /Users/kirchnerg/Desktop/courses/course.2026.hwr.fun/slides/stdin(325,6): error FS0039: The namespace or module 'FsCheck' is not defined.
+    Ok, passed 100 tests.
+    val smallerThan81Property: x: int -> bool
+    val test1: int list = [0; 50; 75; 88; 94; 97; 99]
+    val test2: int list = [0; 44; 66; 77; 83; 86; 87]
+    val it: int list = [0; 44; 66; 77; 83; 86; 87]
 
 
 ## Auswahl der Eigenschaften
