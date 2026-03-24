@@ -30,9 +30,112 @@
 ** DONE Programm
 CLOSED: [2026-03-17 Tue 15:07]
 
+- Hausaufgaben
 - Domain Driven Design (DDD)
 - Property Based Testing
 - Exkurs: FP + Logic $\to$ [[https://lean-lang.org/][Lean4]]
+
+* Hausaufgaben [4/4]
+
+** DONE Accumulate
+CLOSED: [2026-03-24 Tue 16:14]
+
+#+begin_src fsharp :results value :exports both
+let rec accumulateR func input acc = 
+    match input with
+    | [] -> acc |> List.rev
+    | head::tail -> accumulateR func tail (func head :: acc)
+let accumulate func input = accumulateR func input []
+let test1 = accumulate (fun x -> x * x) [1; 2; 3]
+let test2 = accumulate (fun (x:string) -> x.ToUpper()) ["hello"; "world"]
+#+end_src
+
+#+RESULTS:
+: val accumulateR: func: ('a -> 'b) -> input: 'a list -> acc: 'b list -> 'b list
+: val accumulate: func: ('a -> 'b) -> input: 'a list -> 'b list
+: val test1: int list = [1; 4; 9]
+: val test2: string list = ["HELLO"; "WORLD"]
+
+** DONE Space Age
+CLOSED: [2026-03-24 Tue 16:14]
+
+#+Name: space-age-01
+#+begin_src fsharp :results value :exports code
+type Planet = 
+    | Mercury
+    | Venus
+    | Earth
+    | Mars
+    | Jupiter
+    | Saturn
+    | Uranus
+    | Neptune
+let orbitalPeriodRelativeToEarthOn planet = 
+    match planet with
+    | Mercury -> 0.2408467
+    | Venus -> 0.61519726
+    | Earth -> 1.0
+    | Mars -> 1.8808158
+    | Jupiter -> 11.862615
+    | Saturn -> 29.447498
+    | Uranus -> 84.016846
+    | Neptune -> 164.79132
+#+end_src
+
+#+RESULTS: space-age-01
+#+begin_example
+type Planet =
+  | Mercury
+  | Venus
+  | Earth
+  | Mars
+  | Jupiter
+  | Saturn
+  | Uranus
+  | Neptune
+val orbitalPeriodRelativeToEarthOn: planet: Planet -> float
+#+end_example
+
+** DONE Space Age (II)
+CLOSED: [2026-03-24 Tue 16:14]
+
+#+Name:space-age-02
+#+begin_src fsharp :results value :exports both :eval no
+open System
+[<Literal>]
+let SecondsInOneEarthYear = 31557600.0
+let secondsInAYearOn planet =
+    SecondsInOneEarthYear * orbitalPeriodRelativeToEarthOn planet
+let round (number : float) = Math.Round(number, 2)
+let age (planet: Planet) (seconds: int64): float =
+    float seconds / (secondsInAYearOn planet)
+    |> round
+let test1 = age Earth 1000000000L
+#+end_src
+
+#+RESULTS: space-age-02
+: [<Literal>]
+: val SecondsInOneEarthYear: float = 31557600
+: val secondsInAYearOn: planet: Planet -> float
+: val round: number: float -> float
+: val age: planet: Planet -> seconds: int64 -> float
+: val test1: float = 31.69
+
+** DONE Zusammenfassung
+CLOSED: [2026-03-24 Tue 16:14]
+
+- nutze [[https://exercism.io][exercism.io]]!
+- Vermeide =mutable=!!
+- nur wichtiges verdient einen Namen
+- Vertraue der *Pipe* (=>>=, =|>=, ...)!!
+- If-Then-Else mit Boolean ist unnötig
+- Parametrisiere!
+- If-Then-Else vermeiden ... besser =match=!
+- Be lazy! (vermeide =for=-loops)
+- [[https://fsharpforfunandprofit.com/troubleshooting-fsharp/][Troubleshooting F#]]
+- [[https://docs.microsoft.com/de-de/dotnet/fsharp/style-guide/][F#-Styleguide]]
+  
+
 
 * DDD (Domain Driven Design) [8/8]
 ** DONE DDD
@@ -224,10 +327,10 @@ FsCheck.Check.Quick (commutativeProperty add2)
 FsCheck.Check.Quick (commutativeProperty add1)
 FsCheck.Check.Quick (commutativeProperty add2);;
 Ok, passed 100 tests.
-Falsifiable, after 1 test (3 shrinks) (StdGen (1916668567, 297460728)):
+Falsifiable, after 1 test (3 shrinks) (StdGen (172469033, 297603985)):
 Original:
--1
 2
+-2
 Shrunk:
 0
 1
@@ -261,11 +364,11 @@ let test = tempGen |> FsCheck.Gen.sample 0 20
 test;;
 val tempGen: FsCheck.Gen<Temp> = Gen <fun:Bind@88>
 val test: Temp list =
-  [F 83; F 91; F 68; F 36; C 60.0; C 50.0; C 70.0; C 60.0; F 84; F 52; F 210;
-   F 178; C 100.0; C 90.0; C 71.0; F 39; C 78.0; C 56.0; C 86.0; C 74.0]
+  [F 186; F 154; F 131; C 5.0; C 25.0; C 15.0; C 35.0; F 170; F 147; F 115;
+   F 92; C 45.0; C 65.0; F 135; F 56; F 170; F 57; C 66.0; F 139; F 60]
 val it: Temp list =
-  [F 83; F 91; F 68; F 36; C 60.0; C 50.0; C 70.0; C 60.0; F 84; F 52; F 210;
-   F 178; C 100.0; C 90.0; C 71.0; F 39; C 78.0; C 56.0; C 86.0; C 74.0]
+  [F 186; F 154; F 131; C 5.0; C 25.0; C 15.0; C 35.0; F 170; F 147; F 115;
+   F 92; C 45.0; C 65.0; F 135; F 56; F 170; F 57; C 66.0; F 139; F 60]
 #+end_example
 
 ** DONE FsCheck (Shrink)
@@ -282,9 +385,9 @@ test2
 #+end_src
 
 #+RESULTS:
-: Falsifiable, after 89 tests (2 shrinks) (StdGen (2110673557, 297460728)):
+: Falsifiable, after 99 tests (3 shrinks) (StdGen (247653563, 297603985)):
 : Original:
-: 85
+: 89
 : Shrunk:
 : 81
 : val smallerThan81Property: x: int -> bool
@@ -320,7 +423,7 @@ Any sufficiently advanced technology is indistinguishable from magic.
 ** DONE FP + Beweisasistent
 CLOSED: [2026-03-17 Tue 15:23]
 
-[[https://lean-lang.org/][Lean 4]] ist sowohl eine funktionale Programmiersprache (ähnlich wie F#) als auch ein interaktiver Theorembeweiser.
+ ist sowohl eine funktionale Programmiersprache (ähnlich wie F#) als auch ein interaktiver Theorembeweiser.
 
 Du kannst damit also sowohl eine App schreiben als auch mathematisch lückenlos beweisen, dass sie genau das tut, was sie soll.
 

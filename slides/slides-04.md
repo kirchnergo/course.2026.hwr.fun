@@ -5,9 +5,87 @@
 
 ## Programm
 
+-   Hausaufgaben
 -   Domain Driven Design (DDD)
 -   Property Based Testing
 -   Exkurs: FP + Logic $\to$ [Lean4](https://lean-lang.org/)
+
+
+# Hausaufgaben 
+
+
+## Accumulate
+
+    let rec accumulateR func input acc = 
+        match input with
+        | [] -> acc |> List.rev
+        | head::tail -> accumulateR func tail (func head :: acc)
+    let accumulate func input = accumulateR func input []
+    let test1 = accumulate (fun x -> x * x) [1; 2; 3]
+    let test2 = accumulate (fun (x:string) -> x.ToUpper()) ["hello"; "world"]
+
+    val accumulateR: func: ('a -> 'b) -> input: 'a list -> acc: 'b list -> 'b list
+    val accumulate: func: ('a -> 'b) -> input: 'a list -> 'b list
+    val test1: int list = [1; 4; 9]
+    val test2: string list = ["HELLO"; "WORLD"]
+
+
+## Space Age
+
+    type Planet = 
+        | Mercury
+        | Venus
+        | Earth
+        | Mars
+        | Jupiter
+        | Saturn
+        | Uranus
+        | Neptune
+    let orbitalPeriodRelativeToEarthOn planet = 
+        match planet with
+        | Mercury -> 0.2408467
+        | Venus -> 0.61519726
+        | Earth -> 1.0
+        | Mars -> 1.8808158
+        | Jupiter -> 11.862615
+        | Saturn -> 29.447498
+        | Uranus -> 84.016846
+        | Neptune -> 164.79132
+
+
+## Space Age (II)
+
+    open System
+    [<Literal>]
+    let SecondsInOneEarthYear = 31557600.0
+    let secondsInAYearOn planet =
+        SecondsInOneEarthYear * orbitalPeriodRelativeToEarthOn planet
+    let round (number : float) = Math.Round(number, 2)
+    let age (planet: Planet) (seconds: int64): float =
+        float seconds / (secondsInAYearOn planet)
+        |> round
+    let test1 = age Earth 1000000000L
+
+    [<Literal>]
+    val SecondsInOneEarthYear: float = 31557600
+    val secondsInAYearOn: planet: Planet -> float
+    val round: number: float -> float
+    val age: planet: Planet -> seconds: int64 -> float
+    val test1: float = 31.69
+
+
+## Zusammenfassung
+
+-   nutze [exercism.io](https://exercism.io)!
+-   Vermeide `mutable`!!
+-   nur wichtiges verdient einen Namen
+-   Vertraue der **Pipe** (`>>`, `|>`, &#x2026;)!!
+-   If-Then-Else mit Boolean ist unnötig
+-   Parametrisiere!
+-   If-Then-Else vermeiden &#x2026; besser `match`!
+-   Be lazy! (vermeide `for`-loops)
+-   [Troubleshooting F#](https://fsharpforfunandprofit.com/troubleshooting-fsharp/)
+-   [F#-Styleguide](https://docs.microsoft.com/de-de/dotnet/fsharp/style-guide/)
 
 
 # DDD (Domain Driven Design) 
@@ -170,15 +248,11 @@ $\leadsto$ [Property Based Testing](./4.2 An introduction to property based test
 
     FsCheck.Check.Quick (commutativeProperty add1)
     FsCheck.Check.Quick (commutativeProperty add2);;
-    Ok, passed 100 tests.
-    Falsifiable, after 1 test (2 shrinks) (StdGen (1313711035, 297601404)):
-    Original:
-    1
-    -1
-    Shrunk:
-    0
-    1
-    val it: unit = ()
+    
+      FsCheck.Check.Quick (commutativeProperty add1)
+      ^^^^^^^
+    
+    /Users/kirchnerg/Desktop/courses/course.2026.hwr.fun/slides/stdin(309,1): error FS0039: The value, namespace, type or module 'FsCheck' is not defined.
 
 
 ## FsCheck (Generate)
@@ -201,13 +275,11 @@ $\leadsto$ [Property Based Testing](./4.2 An introduction to property based test
     
     let test = tempGen |> FsCheck.Gen.sample 0 20
     test;;
-    val tempGen: Gen<Temp> = Gen <fun:Bind@88>
-    val test: Temp list =
-      [C 5.0; C 25.0; C 15.0; F 163; F 131; F 108; F 76; C 55.0; C 45.0; C 65.0;
-       C 55.0; F 124; F 92; F 69; C 75.0; C 95.0; F 80; C 93.0; C 66.0; C 11.0]
-    val it: Temp list =
-      [C 5.0; C 25.0; C 15.0; F 163; F 131; F 108; F 76; C 55.0; C 45.0; C 65.0;
-       C 55.0; F 124; F 92; F 69; C 75.0; C 95.0; F 80; C 93.0; C 66.0; C 11.0]
+    
+          FsCheck.Gen.oneof [fGen; cGen]
+      ----^^^^^^^
+    
+    /Users/kirchnerg/Desktop/courses/course.2026.hwr.fun/slides/stdin(320,5): error FS0039: The value, namespace, type or module 'FsCheck' is not defined.
 
 
 ## FsCheck (Shrink)
@@ -220,15 +292,11 @@ $\leadsto$ [Property Based Testing](./4.2 An introduction to property based test
     let test2 = FsCheck.Arb.shrink 88 |> Seq.toList
     test2
 
-    Falsifiable, after 92 tests (3 shrinks) (StdGen (1314687095, 297601404)):
-    Original:
-    89
-    Shrunk:
-    81
-    val smallerThan81Property: x: int -> bool
-    val test1: int list = [0; 50; 75; 88; 94; 97; 99]
-    val test2: int list = [0; 44; 66; 77; 83; 86; 87]
-    val it: int list = [0; 44; 66; 77; 83; 86; 87]
+    
+      open FsCheck
+      -----^^^^^^^
+    
+    /Users/kirchnerg/Desktop/courses/course.2026.hwr.fun/slides/stdin(325,6): error FS0039: The namespace or module 'FsCheck' is not defined.
 
 
 ## Auswahl der Eigenschaften
@@ -256,7 +324,7 @@ $\leadsto$ [Property Based Testing](./4.2 An introduction to property based test
 
 ## FP + Beweisasistent
 
-[Lean 4](https://lean-lang.org/) ist sowohl eine funktionale Programmiersprache (ähnlich wie F#) als auch ein interaktiver Theorembeweiser.
+ist sowohl eine funktionale Programmiersprache (ähnlich wie F#) als auch ein interaktiver Theorembeweiser.
 
 Du kannst damit also sowohl eine App schreiben als auch mathematisch lückenlos beweisen, dass sie genau das tut, was sie soll.
 
